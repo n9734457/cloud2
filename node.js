@@ -20,9 +20,9 @@ var client = new Twitter({
     access_token_secret: 'P7jLDl5FnctOPsKdRz5j1wQRwx4bws7trMA2XrKPoieRK'
 });
 
-client.get('search/tweets', {q: '#incident'}, function(error, tweets, response) {
+client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(error, tweets, response) {
     console.log(tweets.statuses[0].text);
-    //Get each tweet status, append the text and creation date to tweetData file
+    //Get each tweet status, append the text and creation date to tweetData array in separate file
     for (let index = 0; index < tweets.statuses.length; index++) {
         const data = {
         text: tweets.statuses[index].text,
