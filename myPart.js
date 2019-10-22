@@ -23,8 +23,10 @@ var client = new Twitter({
 });
 
 client.get('search/tweets', {q: '#incident'}, function(error, tweets, response) {
-    for(i = 0; i <= tweets.statuses){
-
+    for(i = 0; i <= tweets.statuses.length;i++){ 
+        var holder = {
+            
+        }
     }
     //push 
  });
