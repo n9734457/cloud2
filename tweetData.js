@@ -1,6 +1,3 @@
-const TweetData = [
-    {
-        created_by,
-        text 
-    }
-]
+var tweetData = [];
+
+module.exports = tweetData;
