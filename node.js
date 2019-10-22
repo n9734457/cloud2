@@ -4,12 +4,12 @@ const axios = require('axios');
 //const redis = require('redis');
 const Twitter = require('twitter');
 const http = require('http')
+const exphbs = require('express-handlebars');
 const app = express();
 const tweetData = require('./tweetData');
 
-//
-//app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
-//app.set('view engine', 'handlebars');
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
 
 
 //Twitter api connection Token 
