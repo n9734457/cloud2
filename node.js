@@ -29,7 +29,7 @@ client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(e
         created_at:tweets.statuses[index].created_at
         }
         
-        tweetData.push(totalData);
+        tweetData.push(data);
     }
 
 
