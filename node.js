@@ -5,11 +5,11 @@ const axios = require('axios');
 const Twitter = require('twitter');
 const http = require('http')
 const app = express();
-const tweetData= require('./tweetData');
+const tweetData = require('./tweetData');
 
 //
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
-app.set('view engine', 'handlebars');
+//app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+//app.set('view engine', 'handlebars');
 
 
 //Twitter api connection Token 
@@ -24,9 +24,15 @@ client.get('search/tweets', {q: '#incident'}, function(error, tweets, response) 
     console.log(tweets.statuses[0].text);
     //Get each tweet status, append the text and creation date to tweetData file
     for (let index = 0; index < tweets.statuses.length; index++) {
-       // const element = array[index];
+        const data = {
+        text: tweets.statuses[index].text,
+        created_at:tweets.statuses[index].created_at
+        }
         
+        tweetData.push(data);
     }
+
+
  });
 
 
