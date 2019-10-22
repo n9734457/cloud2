@@ -32,8 +32,12 @@ client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(e
         tweetData.push(data);
     }
 
+ });
 
-
+ app.get ('/index', (req, res) => {
+     res.render('index', {
+         
+     })
  });
 
 
