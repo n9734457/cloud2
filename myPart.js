@@ -6,7 +6,7 @@ const Twitter = require('twitter');
 const http = require('http')
 const path = require("path");
 const exphbs = require('express-handlebars');
-const tweetData = require('./tweetData');
+const tweetData = require('./TweetData');
 const app = express();
 
 //
@@ -22,13 +22,19 @@ var client = new Twitter({
     access_token_secret: 'P7jLDl5FnctOPsKdRz5j1wQRwx4bws7trMA2XrKPoieRK'
 });
 
-client.get('search/tweets', {q: '#incident'}, function(error, tweets, response) {
-    for(i = 0; i <= tweets.statuses.length;i++){ 
+
+var test =[];
+
+client.get('search/tweets', {q: 'incident'}, function(error, tweets, response) {
+    console.log(tweets.statuses.length);
+    for(i = 0; i < tweets.statuses.length;i++){ 
         var holder = {
-            
+            created_at: tweets.statuses[i].created_at,
+            text: tweets.statuses[i].text
         }
+    tweetData.push(holder); 
     }
-    //push 
+    console.log(tweetData);
  });
 
 
