@@ -22,7 +22,6 @@ var client = new Twitter({
 
 client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(error, tweets, response) {
     console.log(tweets.statuses[0].text);
-    var totalData = '';
     //Get each tweet status, append the text and creation date to tweetData array in separate file
     for (let index = 0; index < tweets.statuses.length; index++) {
         const data = {
@@ -30,9 +29,9 @@ client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(e
         created_at:tweets.statuses[index].created_at
         }
         
-        totalData = totalData + JSON.stringify(data);
+        tweetData.push(totalData);
     }
-    tweetData.push(totalData);
+
 
 
  });
