@@ -18,24 +18,20 @@ var client = new Twitter({
 });
 
 var test = [];
-client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(error, tweets, response) {
-    console.log(tweets.statuses[0].text);
-    //Get each tweet status, append the text and creation date to tweetData array in separate file
-    for (let index = 0; index < tweets.statuses.length; index++) {
-        const data = {
-        text: tweets.statuses[index].text,
-        created_at:tweets.statuses[index].created_at
+
+client.get('search/tweets', {q: 'incident', count: 200}, function(error, tweets, response) {
+    for(i = 0; i < tweets.statuses.length;i++){ 
+        var holder = { 
+            created_at: tweets.statuses[i].created_at,
+            text: tweets.statuses[i].text
         }
-        test.push(data);
+    test.push(holder); 
+    var source = 'melbourne';
+    console.log(test[i].text);
+    console.log(natural.LevenshteinDistance(source, test[i].text, {search: true}));
+    console.log('/n');
     }
-});
-
-
-var source = ['fire','melbourne'];
-
-console.log(test.log);
-//console.log(natural.LevenshteinDistance(source, test, {search: true}));
-
+ });
 
 
 app.listen(5000, () => {
