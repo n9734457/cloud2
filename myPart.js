@@ -25,7 +25,7 @@ var client = new Twitter({
 
 var test =[];
 
-client.get('search/tweets', {q: 'incident'}, function(error, tweets, response) {
+client.get('search/tweets', {q: 'incident', count: 100}, function(error, tweets, response) {
     console.log(tweets.statuses.length);
     for(i = 0; i < tweets.statuses.length;i++){ 
         var holder = {
@@ -36,7 +36,6 @@ client.get('search/tweets', {q: 'incident'}, function(error, tweets, response) {
     }
     console.log(tweetData);
  });
-
 
 app.listen(3000, () => {
     console.log('Server listening on port: ', 3000);
