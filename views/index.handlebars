@@ -3,6 +3,32 @@
         See Popular Results
     </button>
         <canvas id="myChart"></canvas>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="pre-scrollable">
+                    {{#if word1}}
+                        {{#each word1}}
+                            <div class="card-body">
+                                <h5 class="card-title">{{this.name}}</h5>
+                                <p class="card-text">{{this.text}}</p>
+                            </div>
+                        {{/each}}
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="pre-scrollable">
+                {{#if word2}}
+                    {{#each word2}}
+                        <div class="card-body">
+                            <h5 class="card-title">{{this.name}}</h5>
+                            <p class="card-text">{{this.text}}</p>
+                        </div>
+                    {{/each}}
+                {{/if}}
+                </div>
+            </div>
+        </div>
 </div>
 
 <style>
@@ -15,7 +41,6 @@
       background-attachment: fixed;
     }
     #logo{
-        color: white;
         background: white;
         padding: 2%;
     }
@@ -28,3 +53,6 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 {{{t}}}
+
+
+
