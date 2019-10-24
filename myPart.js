@@ -34,8 +34,14 @@ client.get('search/tweets', {q: 'incident', count: 100}, function(error, tweets,
         }
     tweetData.push(holder); 
     }
-    console.log(tweetData);
+    //console.log(tweetData);
  });
+
+ app.get ('/index', (req, res) => {
+    res.render('index', {
+        
+    })
+});
 
 app.listen(3000, () => {
     console.log('Server listening on port: ', 3000);
