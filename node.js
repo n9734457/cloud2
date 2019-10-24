@@ -15,14 +15,14 @@ app.set('view engine', 'handlebars');
 
 //Twitter api connection Token 
 var client = new Twitter({
-    consumer_key: 'sxEwVBfoOYP0OT3WzUncMaVbf',
-    consumer_secret: 'QRuxi60ycnYIdn8thFOiSGSzKivAtfQb0LU4q3XoPrVSs1FQLC',
-    access_token_key: '1166624996682280963-pDGUHNoxasnGKnISsuOr2QXFVRoSDx',
-    access_token_secret: 'P7jLDl5FnctOPsKdRz5j1wQRwx4bws7trMA2XrKPoieRK'
+    consumer_key: 'GKoc8IOfNWguBDG4ZqcXDLj0Q',
+    consumer_secret: 'qdNx8GJvTzLMfDiv1fPMj8onhItucpjHYRgyKty5itnaiotDnG',
+    access_token_key: '1166624996682280963-YBysjVrHljKDoH5Pvl1ZQtaGEhZkDs',
+    access_token_secret: 'WIQ9M6l7rnUpPwk18F06xQsAUBJfzlGmqzZBcNuSZxe9A'
 });
 
 client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(error, tweets, response) {
-    console.log(tweets.statuses[0].text);
+    console.log(tweets);
     //Get each tweet status, append the text and creation date to tweetData array in separate file
     for (let index = 0; index < tweets.statuses.length; index++) {
         const data = {
