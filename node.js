@@ -7,6 +7,7 @@ const http = require('http')
 const exphbs = require('express-handlebars');
 const app = express();
 const tweetData = require('./tweetData');
+const chart = require('chart.js');
 
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
