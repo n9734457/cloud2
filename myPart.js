@@ -25,24 +25,6 @@ var client = new Twitter({
     access_token_secret: 'WIQ9M6l7rnUpPwk18F06xQsAUBJfzlGmqzZBcNuSZxe9A'
 });
 
-//
-/*const bucketName = 'compareme-twitter-store';
-
-//S3 Promise 
-const bucketPromise = new AWS.S3({ apiVersion: '2006-03-01' }).createBucket({ Bucket: bucketName }).promise();
-bucketPromise.then(function (data) {
-    console.log("Using S3 bucket: " + bucketName);
-})
-.catch(function (err) {
-    console.error(err, err.stack);
-});
-
-// This section will change for Cloud Services
-const redisClient = redis.createClient();
-redisClient.on('error', (err) => {
-    console.log("Error " + err);
-}); */
-
 var word1 =[];
 var word2= [];
 function compaer(input1,input2){
@@ -82,26 +64,7 @@ function compaer(input1,input2){
 
 app.get ('/index', (req, res) => {
     var searchItem1 = req.query.search1;
-    var searchItem2 = req.query.search2; 
-    const redisKey1 = `compare:`+ searchItem1;
-    const redisKey2 = `compare:`+ searchItem2;
-    const s3Key1 = `compare-`+ searchItem1;
-    const s3Key2 = `compare-`+ searchItem2;
-
-    //
-    /*const params1 = { Bucket: bucketName, Key: s3Key1 };
-
-    const params2 = { Bucket: bucketName, Key: s3Key2 };
-    */
-
-   /* return redisClient.get(redisKey1, (err,result) => {
-        if (result){
-            console.log("Data for '" + searchItem1 + "' already exists in Redis Cache. Serving in Cache.");
-            const resultJSON = JSON.parse(result);
-            return res.status(200).json(resultJSON);
-        }
-    });*/
-
+    var searchItem2 = req.query.search2;
 
     word1= [];
     word2 = [];
@@ -138,7 +101,7 @@ app.get ('/index', (req, res) => {
                     '}' +
                 ');' +
                 '</script>';
-    },2000);
+    },4000);
 }
     setTimeout(function(){
         res.render('index', {
@@ -146,7 +109,7 @@ app.get ('/index', (req, res) => {
             word1,
             word2
         })
-    },2000);
+    },4000);
 });
 
 function OutputData(dataValues)
