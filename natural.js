@@ -11,26 +11,16 @@ var natural = require('natural');
 const app = express();
 
 var client = new Twitter({
-    consumer_key: 'sxEwVBfoOYP0OT3WzUncMaVbf',
-    consumer_secret: 'QRuxi60ycnYIdn8thFOiSGSzKivAtfQb0LU4q3XoPrVSs1FQLC',
-    access_token_key: '1166624996682280963-pDGUHNoxasnGKnISsuOr2QXFVRoSDx',
-    access_token_secret: 'P7jLDl5FnctOPsKdRz5j1wQRwx4bws7trMA2XrKPoieRK'
+    consumer_key: 'GKoc8IOfNWguBDG4ZqcXDLj0Q',
+    consumer_secret: 'qdNx8GJvTzLMfDiv1fPMj8onhItucpjHYRgyKty5itnaiotDnG',
+    access_token_key: '1166624996682280963-YBysjVrHljKDoH5Pvl1ZQtaGEhZkDs',
+    access_token_secret: 'WIQ9M6l7rnUpPwk18F06xQsAUBJfzlGmqzZBcNuSZxe9A'
 });
 
 var test = [];
 
-client.get('search/tweets', {q: 'incident', count: 200}, function(error, tweets, response) {
-    for(i = 0; i < tweets.statuses.length;i++){ 
-        var holder = { 
-            created_at: tweets.statuses[i].created_at,
-            text: tweets.statuses[i].text
-        }
-    test.push(holder); 
-    var source = 'melbourne';
-    console.log(test[i].text);
-    console.log(natural.LevenshteinDistance(source, test[i].text, {search: true}));
-    console.log('/n');
-    }
+client.get('search/tweets', {q: 'incident', count: 100}, function(error, tweets, response) {
+    console.log(tweets);
  });
 
 
