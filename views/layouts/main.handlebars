@@ -9,36 +9,28 @@
     <title>Incident Tweet</title>
 </head>
 <body>
-
-<div class="headerBG">
-    <h1>
-        Incident Report
-    </h1>
-</div>
-<div class="container">
-    <div class="">
-
-    </div>
-</div>
+      <div class="container-fluid">
+      <form action="/">
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <a class="navbar-brand" href="/">Incident Report</a>
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">
+                Home
+              </a>
+            </li>
+          </ul>
+            <form class="form-inline">
+                <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search for an incident" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search Location" >Find</button>
+            </form>
+        </nav>
+      </form>
 
         {{{body}}}
         
   </div>
 </body>
-
-<style>
-    .headerBG{
-        height: 100%;
-        width: 100%;
-        background-color: blueviolet;
-        color: white;
-        text-align: center;
-    }
-
-    .headerBG h1 {
-        font-size: 700%;
-    }
-</style>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
