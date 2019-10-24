@@ -28,6 +28,7 @@ var word1 =[];
 var word2= [];
 
 function compaer(input1,input2){
+    for(j = 0; j < 3;j++){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'recent'}, function(error, tweets, response) {
             var source = input1;
             for(i = 0; i < tweets.statuses.length;i++){
@@ -55,23 +56,51 @@ function compaer(input1,input2){
                 }
             }
             console.log(word2.length);
-    
          });
-         //console.log(date.getMinutes() + ',' + date.getSeconds())
+    }
 }
-
-client.get('search/tweets', {q: 'Lebron', count: 100, lang: 'en',recent_type: 'recent',}, function(error, tweets, response){
-    console.log(tweets.statuses);
- });
-
 
 
 app.get ('/index', (req, res) => {
-    //compaer('Ronaldo',',Messi');
-        res.render('test', {
-            word1
-        })
+    var searchItem1 = req.query.search1;
+    var searchItem2 = req.query.search2;
+    
+    if(searchItem1 && searchItem2){
+        compaer(searchItem1,searchItem2);
+    }
 
+
+    var dataSet = [word1.length, word2.length]
+     var dataSet2 = [searchItem1,searchItem2]
+        var t = '<script>' + 
+        'function renderChart(data, labels) {' +
+            'var ctx = document.getElementById("myChart").getContext("2d");' +
+            'var myChart = new Chart(ctx, {' +
+                'type: "bar",' +
+                'data: {' +
+                    'labels: labels,' +
+                    'datasets: [{' +
+                        'label: "This week",' +
+                        'data: data,' +
+                    '}]' +
+                '},' +
+            '});' +
+        '}' +
+        
+        '$("#renderBtn").click(' +
+            'function () {' +
+                'data = [' + OutputData(dataSet) + '];' +
+                'labels =  [' + OutputLabels(dataSet2) + '];' +
+                'renderChart(data, labels);' +
+            '}' +
+        ');' +
+        '</script>';
+
+    setTimeout(function(){
+        res.render('index', {
+            t
+        })
+    },2000);
 });
 
 app.get ('/search/results', (req, res) => {
@@ -79,6 +108,27 @@ app.get ('/search/results', (req, res) => {
         
     })
 });
+
+
+function OutputData(dataValues)
+{
+   var valueString = ''; 
+   dataValues.forEach(value => {
+   valueString += value + ',';
+   });
+
+   return valueString.substring(0, valueString.length - 1);
+}
+
+function OutputLabels(dataValues)
+{
+   var valueString = ''; 
+   dataValues.forEach(value => {
+   valueString += '"' + value + '",';
+   });
+
+   return valueString.substring(0, valueString.length - 1);
+}
 
 app.listen(3000, () => {
     console.log('Server listening on port: ', 3000);
