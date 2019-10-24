@@ -28,7 +28,6 @@ var word1 =[];
 var word2= [];
 
 function compaer(input1,input2){
-    for(j = 0; j < 3;j++){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'recent'}, function(error, tweets, response) {
             var source = input1;
             for(i = 0; i < tweets.statuses.length;i++){
@@ -57,45 +56,45 @@ function compaer(input1,input2){
             }
             console.log(word2.length);
          });
-    }
 }
-
 
 app.get ('/index', (req, res) => {
     var searchItem1 = req.query.search1;
     var searchItem2 = req.query.search2;
-    
     if(searchItem1 && searchItem2){
-        compaer(searchItem1,searchItem2);
-    }
-
-
-    var dataSet = [word1.length, word2.length]
-     var dataSet2 = [searchItem1,searchItem2]
-        var t = '<script>' + 
-        'function renderChart(data, labels) {' +
-            'var ctx = document.getElementById("myChart").getContext("2d");' +
-            'var myChart = new Chart(ctx, {' +
-                'type: "bar",' +
-                'data: {' +
-                    'labels: labels,' +
-                    'datasets: [{' +
-                        'label: "This week",' +
-                        'data: data,' +
-                    '}]' +
-                '},' +
-            '});' +
-        '}' +
-        
-        '$("#renderBtn").click(' +
-            'function () {' +
-                'data = [' + OutputData(dataSet) + '];' +
-                'labels =  [' + OutputLabels(dataSet2) + '];' +
-                'renderChart(data, labels);' +
-            '}' +
-        ');' +
-        '</script>';
-
+    compaer(searchItem1,searchItem2);
+    var t = [];
+    setTimeout(function(){
+            var dataInput1 = parseInt(word1.length);
+            var dataInput2 = parseInt(word2.length);
+            var dataSet = [dataInput1, dataInput2, 0];
+             var dataSet2 = [searchItem1,searchItem2, ""]
+                t = '<script>' + 
+                'function renderChart(data, labels) {' +
+                    'var ctx = document.getElementById("myChart").getContext("2d");' +
+                    'var myChart = new Chart(ctx, {' +
+                        'type: "bar",' +
+                        'data: {' +
+                            'labels: labels,' +
+                            'datasets: [{' +
+                                'label: "Comparison",' +
+                                'BackgroundColor: "rbg(225,99,132)",'+
+                                'data: data,' +
+                            '}]' +
+                        '},' +
+                    '});' +
+                '}' +
+                
+                '$("#renderBtn").click(' +
+                    'function () {' +
+                        'data = [' + OutputData(dataSet) + '];' +
+                        'labels =  [' + OutputLabels(dataSet2) + '];' +
+                        'renderChart(data, labels);' +
+                    '}' +
+                ');' +
+                '</script>';
+    },2000);
+}
     setTimeout(function(){
         res.render('index', {
             t
