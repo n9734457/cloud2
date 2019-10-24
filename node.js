@@ -29,70 +29,63 @@ client.get('search/tweets', {q: '#incident', lang: 'en', count: 100}, function(e
         text: tweets.statuses[index].text,
         created_at:tweets.statuses[index].created_at
         }
-        
+        var d = [1, 2, 3];
+        //console.log(createChart(d));
         tweetData.push(data);
     }
 
  });
 
  app.get ('/index', (req, res) => {
+     var dataSet = [1000, 2000, 3000, 40000, 5000, 6500, 7777]
+     var dataSet2 = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+        var t = '<script>' + 
+        'function renderChart(data, labels) {' +
+            'var ctx = document.getElementById("myChart").getContext("2d");' +
+            'var myChart = new Chart(ctx, {' +
+                'type: "bar",' +
+                'data: {' +
+                    'labels: labels,' +
+                    'datasets: [{' +
+                        'label: "This week",' +
+                        'data: data,' +
+                    '}]' +
+                '},' +
+            '});' +
+        '}' +
+        
+        '$("#renderBtn").click(' +
+            'function () {' +
+                'data = [' + OutputData(dataSet) + '];' +
+                'labels =  [' + OutputLabels(dataSet2) + '];' +
+                'renderChart(data, labels);' +
+            '}' +
+        ');' +
+        '</script>';
      res.render('index', {
-         
+        t   
      })
  });
 
- function createChart(dataValues) {
-    const head = '<canvas id="myChart" width="400" height="400"></canvas>' +
-    "<script>" +
-    "var ctx = document.getElementById('myChart');" +
-    "var myChart = new Chart(ctx, {" +
-        "type: 'bar'," +
-        "data: {" +
-            "labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange']," +
-            "datasets: [{" +
-                "label: '# of Votes', " +
-                "data: [";
-
-    const tail = "]," + 
-            "backgroundColor: [" +
-              "'rgba(255, 99, 132, 0.2)'," +
-                "'rgba(54, 162, 235, 0.2)'," +
-                "'rgba(255, 206, 86, 0.2)'," +
-                "'rgba(75, 192, 192, 0.2)'," +
-                "'rgba(153, 102, 255, 0.2)'," +
-                "'rgba(255, 159, 64, 0.2)'" +
-            "]," +
-            "borderColor: [" +
-                "'rgba(255, 99, 132, 1)'," +
-                "'rgba(54, 162, 235, 1)'," +
-                "'rgba(255, 206, 86, 1)'," +
-                "'rgba(75, 192, 192, 1)'," +
-                "'rgba(153, 102, 255, 1)'," +
-                "'rgba(255, 159, 64, 1)'" +
-            "]," +
-            "borderWidth: 1" +
-        "}]" +
-    "},"
-    "options: {" +
-        "scales: {" +
-            "yAxes: [{" +
-                "ticks: {" +
-                    "beginAtZero: true" +
-                "}" +
-            "}]" +
-        "}" +
-    "}" +
-"});" +
-"</script>";
-
-const valueString; 
-
-dataValues.forEach(value => {
+ function OutputData(dataValues)
+ {
+    var valueString = ''; 
+    dataValues.forEach(value => {
     valueString += value + ',';
-});
+    });
 
-    return head + valueString + tail;
-}
+    return valueString.substring(0, valueString.length - 1);
+ }
+
+ function OutputLabels(dataValues)
+ {
+    var valueString = ''; 
+    dataValues.forEach(value => {
+    valueString += '"' + value + '",';
+    });
+
+    return valueString.substring(0, valueString.length - 1);
+ }
 
 app.listen(3000, () => {
     console.log('Server listening on port: ', 3000);
