@@ -45,7 +45,7 @@ redisClient.on('error', (err) => {
 
 var word1 =[];
 var word2= [];
-function compaer(input1,output){
+function compaer(input1,input2){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
             for(i = 0; i < tweets.statuses.length;i++){
@@ -57,9 +57,26 @@ function compaer(input1,output){
                         profile_img: tweets.statuses[i].user.profile_image_url_https,
                         text: tweets.statuses[i].text
                     }
-                    output.push(holder);
+                    word1.push(holder);
                 }
             } 
+            console.log(word1.length);
+         });
+         client.get('search/tweets', {q: input2, count: 100, lang: 'en',recent_type: 'popular',}, function(error, tweets, response){
+            var source = input2;
+            for(i = 0; i < tweets.statuses.length;i++){
+            var t = natural.LevenshteinDistance(source, tweets.statuses[i].text, {search: true});
+                if(t.distance <2){
+                    var holder = {
+                        created_at: tweets.statuses[i].created_at,
+                        name: tweets.statuses[i].user.name,
+                        profile_img: tweets.statuses[i].user.profile_image_url_https,
+                        text: tweets.statuses[i].text
+                    }
+                    word2.push(holder);
+                }
+            }
+            console.log(word2.length);
          });
 }
 
@@ -88,12 +105,12 @@ app.get ('/index', (req, res) => {
         }
     });*/
 
+
     word1= [];
     word2 = [];
 
     if(searchItem1 && searchItem2){
-    compaer(searchItem1,word1);
-    compaer(searchItem2,word2);
+    compaer(searchItem1,searchItem2);
     var t = [];
     setTimeout(function(){
             var dataInput1 = parseInt(word1.length);
