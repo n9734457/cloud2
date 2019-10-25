@@ -45,7 +45,6 @@ redisClient.on('error', (err) => {
 //Variables to hold data
 var word1 =[];
 var word2= [];
-
 function compaer(input1,output,redisKey){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
@@ -62,7 +61,7 @@ function compaer(input1,output,redisKey){
                 }
             } 
             console.log(output.length);
-            redisClient.set(redisKey, JSON.stringify(output),'EX',30);
+            redisClient.setex(redisKey,3000, JSON.stringify(output));
          });
 }
 
@@ -74,82 +73,52 @@ app.get ('/index', (req, res) => {
     const redisKey2 = `compareme:${searchItem2}`;
     const s3Key2 = `compareme-${searchItem2}`;
 
+    var cached = true;
+
     //initialise arrays to keep it empty
     word1= [];
     word2 = [];
+
     //
     const params1 = { Bucket: bucketName, Key: s3Key1 };
     const params2 = { Bucket: bucketName, Key: s3Key2 };
     
     if(searchItem1 && searchItem2){
 
-        redisClient.get(redisKey1, (err,result) =>{
-            //Checks if it is in the cache
-            if(result){
-                word1 = JSON.parse(result); 
-                console.log("Real");
-            } else {
-                    compaer(searchItem1,word1,redisKey1);
-                    console.log("Cached");
-            }
-        });
-
-        redisClient.get(redisKey2, (err,result) =>{
-            //Checks if it is in the cache
-            if(result){
-                word2 = JSON.parse(result); 
-                cached2 = true; 
-                console.log("Real");
-            } else {
-                compaer(searchItem2,word2,redisKey2);
-                cached2 = false; 
+    redisClient.get(redisKey1, (err,result) =>{
+        //Checks if it is in the cache
+        if(result){
+            word1 = JSON.parse(result); 
+                cached = true; 
+            console.log("Real");
+        } else {
+                compaer(searchItem1,word1,redisKey1);
+                cached = !false; 
                 console.log("Cached");
-            }
-        });
-        var t = [];
-        
-        setTimeout(function(){
+        }
+    });
+
+     redisClient.get(redisKey2, (err,result) =>{
+        //Checks if it is in the cache
+        if(result){
+            word2 = JSON.parse(result); 
+            cached = true; 
+            console.log("Real");
+        } else {
+            compaer(searchItem2,word2,redisKey2);
+            cached = !false; 
+            console.log("Cached");
+        }
+    });
+    
+    var t = [];
+    if(cached === false){
+            setTimeout(function(){
                 console.log('slow');
                 var dataInput1 = parseInt(word1.length);
                 var dataInput2 = parseInt(word2.length);
                 var dataSet = [dataInput1, dataInput2, 0];
                 var dataSet2 = [searchItem1,searchItem2, ""]
-
-
-                t = 
-                '<script>' +
-                    'var ctx = document.getElementById("myChart").getContext("2d");'+
-                    'var myChart = new Chart(ctx, {'+
-                        'type: "bar",'+
-                        'data: {'+
-                            'labels: ["'+searchItem1+'","'+searchItem2+'"],'+
-                            'datasets: [{'+
-                                'label: "# of Votes",'+
-                                'data: ['+dataInput1+','+dataInput2+'],'+
-                                'backgroundColor: ['+
-                                    '"rgba(255, 99, 132, 0.2)",'+
-                                    '"rgba(54, 162, 235, 0.2)"'+
-                                '],'+
-                                'borderColor: ['+
-                                    '"rgba(255, 99, 132, 1)",' +
-                                    '"rgba(54, 162, 235, 1)"'+
-                                '],'+
-                                'borderWidth: 1'+
-                            '}]'+
-                       '},'+
-                        'options: {'+
-                            'scales: {'+
-                                'yAxes: [{'+
-                                    'ticks: {'+
-                                       'beginAtZero: true'+
-                                    '}'+
-                                '}]'+
-                            '}'+
-                        '}'+
-                    '});'+
-                '</script>'
-
-                /*
                     t = '<script>' + 
                     'function renderChart(data, labels) {' +
                         'var ctx = document.getElementById("myChart").getContext("2d");' +
@@ -174,16 +143,54 @@ app.get ('/index', (req, res) => {
                         '}' +
                     ');' +
                     '</script>';
-                    */
         },4000);
+    } if (cached == true) {
+        var dataInput1 = parseInt(word1.length);
+        var dataInput2 = parseInt(word2.length);
+        var dataSet = [dataInput1, dataInput2, 0];
+        var dataSet2 = [searchItem1,searchItem2, ""]
+            t = '<script>' + 
+            'function renderChart(data, labels) {' +
+                'var ctx = document.getElementById("myChart").getContext("2d");' +
+                'var myChart = new Chart(ctx, {' +
+                    'type: "bar",' +
+                    'data: {' +
+                        'labels: labels,' +
+                        'datasets: [{' +
+                            'label: "Comparison",' +
+                            'BackgroundColor: "rbg(225,99,132)",'+
+                            'data: data,' +
+                        '}]' +
+                    '},' +
+                '});' +
+            '}' +
+            
+            '$("#renderBtn").click(' +
+                'function () {' +
+                    'data = [' + OutputData(dataSet) + '];' +
+                    'labels =  [' + OutputLabels(dataSet2) + '];' +
+                    'renderChart(data, labels);' +
+                '}' +
+            ');' +
+            '</script>';
     }
-    setTimeout(function(){
+}
+    if(cached === false){
+        setTimeout(function(){
+            res.render('index', {
+                t,
+                word1,
+                word2
+            })
+        },4000);
+    } if(cached === true) {
+        console.log('fast');
         res.render('index', {
             t,
             word1,
             word2
         })
-    },4000);
+    }
 
 });
 
