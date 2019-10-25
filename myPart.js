@@ -46,7 +46,7 @@ redisClient.on('error', (err) => {
 var word1 =[];
 var word2= [];
 
-function compaer(input1,output,redisKey){
+function compaer(input1,output,redisKey,s3Key){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
             for(i = 0; i < tweets.statuses.length;i++){
@@ -62,6 +62,23 @@ function compaer(input1,output,redisKey){
                 }
             } 
             console.log(output.length);
+
+            //Store total in s3 
+            const body = JSON.stringify({
+                time: new Date().getTime(),
+                total: output.length
+            });
+            const objectParams = {
+                Bucket: bucketName,
+                Key: s3Key,
+                Body: body
+            };
+            const uploadPromise = new AWS.S3({ apiVersion: '2006-03-01' }).putObject(objectParams).promise();
+            uploadPromise.then(function (data) {
+                console.log("Data uploaded to " + bucketName + "/" + s3Key + " and Redis Cache.");
+            });
+
+            //Store in cache
             redisClient.set(redisKey, JSON.stringify(output),'EX',30);
          });
 }
@@ -89,7 +106,7 @@ app.get ('/index', (req, res) => {
                 word1 = JSON.parse(result); 
                 console.log("Real");
             } else {
-                    compaer(searchItem1,word1,redisKey1);
+                    compaer(searchItem1,word1,redisKey1,s3Key1);
                     console.log("Cached");
             }
         });
@@ -101,9 +118,17 @@ app.get ('/index', (req, res) => {
                 cached2 = true; 
                 console.log("Real");
             } else {
-                compaer(searchItem2,word2,redisKey2);
-                cached2 = false; 
-                console.log("Cached");
+                return new AWS.S3({ apiVersion: '2006-03-01' }).getObject(params2, (err, result) =>{
+                    if(result){
+                        console.log("in s3");
+                    }else{
+    
+                    }
+                    compaer(searchItem2,word2,redisKey2,s3Key2);
+                    cached2 = false; 
+                    console.log("Cached");
+                });
+
             }
         });
         var t = [];

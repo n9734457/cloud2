@@ -11,6 +11,10 @@
                                 <p class="card-text">{{this.text}}</p>
                             </div>
                         {{/each}}
+                        {{else}}
+                        <h2>
+                            Either no data, or no tweet about the person
+                        </h2>
                     {{/if}}
                 </div>
             </div>
@@ -24,7 +28,11 @@
                             <p class="card-text">{{this.text}}</p>
                         </div>
                     {{/each}}
-                {{/if}}
+                    {{else}}
+                    <h2>
+                        Either no data, or no tweet about the person
+                    </h2>
+                {{/if}} 
                 </div>
             </div>
         </div>
