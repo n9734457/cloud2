@@ -46,9 +46,25 @@ redisClient.on('error', (err) => {
 var word1 =[];
 var word2= [];
 
+var classified = [
+    actor = {
+        keywords: ["comedy","barrymore","mime","actress","drama","thespian","doer","fairbanks","performer","radio","dustin hoffman","theatre","film","character","movie","comedian","pantomime","player","screenplay","television","tragedy","act","tragedian","barnstormer","thespis","greece","star","acting","moore","fonda","hanks","gibson","allen","keaton","worker","histrion","portrayal","role player","spear carrier","role","performance","prepubescent","filmmaker","screenwriter","robin williams","entertainer","sir anthony hopkins","sir alec guinness","robert redford","anthony hopkins","edmund kean","robert de niro","woody allen","playwright","musician","singer","academy award for best actress","silent film","actresses","scriptwriter","screen test","jack lemmon","william shakespeare","europe","ancient rome","opera","laurence olivier","academy award for best supporting actress","early middle ages","peter pan","mezzo-soprano","puritan","late middle ages","commedia dell'arte","theatrical","cooper","lunt","harrison","guinness","grant","poitier","gielgud","garrick","lorre","gable","drew","lee","booth","laughton","depardieu","dean","crosby","coward","lugosi","chevalier","cagney","burton","burbage","kelly","bogart","astaire"]
+    },
+    athelete = {
+        keywords:["athletics","spectator sport","competition","game","racing","gymnastics","sportsman","soccer","rugby union","association football","downfield","offside","cycling","tennis","polo","team","hockey","football","skating","professional sport","athletic","run","call","referee","kill","spar","judo","ineligible","wipeout","schuss","luge","athletic game","team sport","archery","upfield","contact sport","professional football","funambulism","toboggan","professional baseball","professional basketball","personal foul","bobsled","outdoor sport","skiing","riding","skateboard","speed skate","jackknife","ski","sportswoman","rollerblade","figure skate","rowing","ice skate","roller skate","fun","regulation time","play","physical activity","disport","lark","blood sport","baseball","daisy cutter"]
+    },
+    musician = {
+        keywords: ["music","composer","pianist","bassist","singer","percussionist","violinist","flutist","instrumentalist","accompanist","clarinetist","vocalist","guitarist","artist","saxophonist","keyboardist","virtuoso","trumpeter","cellist","trombonist","flautist","organist","jazz","songwriter","classical music","player","piano","band","renaissance","musical instrument","arranger","performer","singing","musical","soloist","conductor","harpsichordist","orchestration","guitar","choirmaster","polyphonic","baritone","melody","fiddler","rocker","accordionist","harpist","lutenist","song","jazzman","clarinettist","saxist","counterpoint","lyricist","bandleader","drummer","jazz musician","actor","dancer","entertainer","folk","comedian","filmmaker","musicologist","poet","church","crooner","folk music","popular music","performing","conducting","philharmonic","violist","orff","ono","herbert","harper","oboist","adapter","transcriber","vibraphonist","piper","director","cantor","precentor","arranging","haydn","wagner","clarion","pizzicato","cantabile","musically","beethoven","largo","qawwali","classical","chopin","riddim","musicology","orchestrate","musicality","recapitulation","tune","loudness","tweedle","hornist","vocalizer","violoncellist","vocaliser","accompanyist","concertinist","cornetist","lutanist","harmoniser","vibist","gambist","carillonneur","bandsman"]
+    },
+    influencer = {
+        keywords: ["celebrity","social media","influencer marketing","blogging","marketing","youtuber","notability","celeb","internet","facebook","twitter","sixdegrees.com","youtube","instagram","tiktok","blogs","wechat","whatsapp","snapchat","vsco","lifestyle guru","momus","personal branding","influence","determinant","stakeholder","factor","communicator","social","marketer","facilitator","advertiser","shaper","segmentation","contributor","podcasting","encourager","analytics","savvy","brands","adopter","gatekeeper","panelist","attendee","salesperson","innovator","sustainer","predictor","endorser","aggregator","trends","verticals","ideation","metrics","kingmaker","tool","maven","inviter","component","demographics","preferences","affluents","follower","philanthropy","panellist","confidante","evangelizing","multichannel","behaviors","evangelists","boomer","variety","hollywood","personality type","vlogging","viral phenomenon","viral video","pewdiepie","internet meme","psychographics","enabler","trendsetters","motivators","differentiator","trendsetter","intrapreneur","implementer","isobar","networker","determiner","twitterer","prescriber","marketeer","definer","aruspex","inceptor","couponing","recommenders","nurturer","creatives","reputability","recommender","swayful","flexitarian","babytalk","jobholder","mktg","schmoozer","discriminator","prsa","embracer"]
+    }
+]
+
 function compaer(input1,output,redisKey,s3Key){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
+            var type; 
             for(i = 0; i < tweets.statuses.length;i++){
             var t = natural.LevenshteinDistance(source, tweets.statuses[i].text, {search: true});
                 if(t.distance <2){
@@ -60,12 +76,24 @@ function compaer(input1,output,redisKey,s3Key){
                     }
                     output.push(holder);
                 }
-            } 
+            }
+            
+            for(i = 0; i < classified.length;i++){
+                for(j = 0; j < classified[i].keywords.length;j++){
+                    var source = classified[i].keywords[j];
+                    var t =  natural.LevenshteinDistance(source, output[i].text, {search: true});
+                    if(t.distance < 1){
+                        type = source; 
+                    }
+                }
+            }
+
+            console.log(output[1].category);
             console.log(output.length);
+
                 //Store total in s3 
                 const body = JSON.stringify({
-                    time: new Date().getTime(),
-                    total: output.length
+                    total: type
                 });
                 const objectParams = {
                     Bucket: bucketName,
@@ -211,7 +239,7 @@ app.get ('/index', (req, res) => {
                     ');' +
                     '</script>';
                     */
-        },4000);
+        },5000);
     }
     setTimeout(function(){
         res.render('index', {
@@ -219,7 +247,7 @@ app.get ('/index', (req, res) => {
             word1,
             word2
         })
-    },4000);
+    },5000);
 
 });
 
