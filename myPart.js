@@ -62,21 +62,20 @@ function compaer(input1,output,redisKey,s3Key){
                 }
             } 
             console.log(output.length);
-
-            //Store total in s3 
-            const body = JSON.stringify({
-                time: new Date().getTime(),
-                total: output.length
-            });
-            const objectParams = {
-                Bucket: bucketName,
-                Key: s3Key,
-                Body: body
-            };
-            const uploadPromise = new AWS.S3({ apiVersion: '2006-03-01' }).putObject(objectParams).promise();
-            uploadPromise.then(function (data) {
-                console.log("Data uploaded to " + bucketName + "/" + s3Key + " and Redis Cache.");
-            });
+                //Store total in s3 
+                const body = JSON.stringify({
+                    time: new Date().getTime(),
+                    total: output.length
+                });
+                const objectParams = {
+                    Bucket: bucketName,
+                    Key: s3Key,
+                    Body: body
+                };
+                const uploadPromise = new AWS.S3({ apiVersion: '2006-03-01' }).putObject(objectParams).promise();
+                uploadPromise.then(function (data) {
+                    console.log("Data uploaded to " + bucketName + "/" + s3Key + " and Redis Cache.");
+                });
 
             //Store in cache
             redisClient.set(redisKey, JSON.stringify(output),'EX',30);
@@ -106,8 +105,20 @@ app.get ('/index', (req, res) => {
                 word1 = JSON.parse(result); 
                 console.log("Real");
             } else {
+                return new AWS.S3({ apiVersion: '2006-03-01' }).getObject(params1, (err, result) =>{
+                    if(result){
+                        console.log(JSON.parse(result.Body));
+                        ifIns3 = true; 
+//                       compaer(searchItem2,word2,redisKey2,s3Key2);
+//                       cached2 = false; 
+//                       console.log("Cached");
+                    }else{
+    
+                    }
                     compaer(searchItem1,word1,redisKey1,s3Key1);
+                    cached2 = false; 
                     console.log("Cached");
+                });
             }
         });
 
@@ -118,9 +129,10 @@ app.get ('/index', (req, res) => {
                 cached2 = true; 
                 console.log("Real");
             } else {
+                //Checks if not in cache checks in the s3 Storage, if it is 
                 return new AWS.S3({ apiVersion: '2006-03-01' }).getObject(params2, (err, result) =>{
                     if(result){
-                        console.log("in s3");
+                        console.log("result");
                     }else{
     
                     }
@@ -128,7 +140,6 @@ app.get ('/index', (req, res) => {
                     cached2 = false; 
                     console.log("Cached");
                 });
-
             }
         });
         var t = [];
