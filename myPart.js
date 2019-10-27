@@ -65,10 +65,12 @@ var classified = [
     }
 ]
 
-function compaer(input1,output,redisKey,s3Key){
+var type1 ='';
+var type2 ='';
+
+function compaer(input1,output,redisKey,s3Key,type){
         client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
-            var type; 
             var counterActor = 0;
             var counterAthelete = 0;
             var counterMusician = 0;
@@ -150,6 +152,8 @@ app.get ('/index', async (req, res) => {
     const redisKey2 = `compareme:${searchItem2}`;
     const s3Key2 = `compareme-${searchItem2}`;
 
+    type1 ='';
+    type2 ='';    
 
     //initialise arrays to keep it empty
     word1= [];
@@ -171,7 +175,7 @@ app.get ('/index', async (req, res) => {
                     }else{
     
                     }
-                    compaer(searchItem1,word1,redisKey1,s3Key1);
+                    compaer(searchItem1,word1,redisKey1,s3Key1,type1);
                     console.log("Cached");
                 });
             }
@@ -190,8 +194,7 @@ app.get ('/index', async (req, res) => {
     
                     }
                     console.log("trying");
-                    compaer(searchItem2,word2,redisKey2,s3Key2);
-
+                    compaer(searchItem2,word2,redisKey2,s3Key2,type2);
                     console.log("Cached");
                 });
             }
@@ -204,6 +207,7 @@ app.get ('/index', async (req, res) => {
                 var dataSet = [dataInput1, dataInput2, 0];
                 var dataSet2 = [searchItem1,searchItem2, ""]
 
+                console.log(type1);
 
                 t = 
                 '<script>' +
@@ -243,7 +247,7 @@ app.get ('/index', async (req, res) => {
         res.render('index', {
             t,
             word1,
-            word2
+            word2,
         })
     },4000);
 
