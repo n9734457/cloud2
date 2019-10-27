@@ -1,17 +1,12 @@
 const express = require('express');
-const responseTime = require('response-time')
-const axios = require('axios');
 const redis = require('redis');
 const Twitter = require('twitter');
-const http = require('http')
-const path = require("path");
 const exphbs = require('express-handlebars');
 var natural = require('natural');
 const AWS = require('aws-sdk');
 
 const app = express();
 
-//
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
@@ -46,30 +41,11 @@ redisClient.on('error', (err) => {
 var word1 =[];
 var word2= [];
 
-var classified = [
-    actor = {
-        str: "actor",
-        keywords: ["comedy","barrymore","mime","actress","drama","thespian","doer","fairbanks","performer","radio","dustin hoffman","theatre","film","character","movie","comedian","pantomime","player","screenplay","television","tragedy","act","tragedian","barnstormer","thespis","greece","star","acting","moore","fonda","hanks","gibson","allen","keaton","worker","histrion","portrayal","role player","spear carrier","role","performance","prepubescent","filmmaker","screenwriter","robin williams","entertainer","sir anthony hopkins","sir alec guinness","robert redford","anthony hopkins","edmund kean","robert de niro","woody allen","playwright","musician","singer","academy award for best actress","silent film","actresses","scriptwriter","screen test","jack lemmon","william shakespeare","europe","ancient rome","opera","laurence olivier","academy award for best supporting actress","early middle ages","peter pan","mezzo-soprano","puritan","late middle ages","commedia dell'arte","theatrical","cooper","lunt","harrison","guinness","grant","poitier","gielgud","garrick","lorre","gable","drew","lee","booth","laughton","depardieu","dean","crosby","coward","lugosi","chevalier","cagney","burton","burbage","kelly","bogart","astaire"]
-    },
-    athelete = {
-        str: "athlete",
-        keywords:["athletics","spectator sport","competition","game","racing","gymnastics","sportsman","soccer","rugby union","association football","downfield","offside","cycling","tennis","polo","team","hockey","football","skating","professional sport","athletic","run","call","referee","kill","spar","judo","ineligible","wipeout","schuss","luge","athletic game","team sport","archery","upfield","contact sport","professional football","funambulism","toboggan","professional baseball","professional basketball","personal foul","bobsled","outdoor sport","skiing","riding","skateboard","speed skate","jackknife","ski","sportswoman","rollerblade","figure skate","rowing","ice skate","roller skate","fun","regulation time","play","physical activity","disport","lark","blood sport","baseball","daisy cutter"]
-    },
-    musician = {
-        str: "musician",
-        keywords: ["music","composer","pianist","bassist","singer","percussionist","violinist","flutist","instrumentalist","accompanist","clarinetist","vocalist","guitarist","artist","saxophonist","keyboardist","virtuoso","trumpeter","cellist","trombonist","flautist","organist","jazz","songwriter","classical music","player","piano","band","renaissance","musical instrument","arranger","performer","singing","musical","soloist","conductor","harpsichordist","orchestration","guitar","choirmaster","polyphonic","baritone","melody","fiddler","rocker","accordionist","harpist","lutenist","song","jazzman","clarinettist","saxist","counterpoint","lyricist","bandleader","drummer","jazz musician","actor","dancer","entertainer","folk","comedian","filmmaker","musicologist","poet","church","crooner","folk music","popular music","performing","conducting","philharmonic","violist","orff","ono","herbert","harper","oboist","adapter","transcriber","vibraphonist","piper","director","cantor","precentor","arranging","haydn","wagner","clarion","pizzicato","cantabile","musically","beethoven","largo","qawwali","classical","chopin","riddim","musicology","orchestrate","musicality","recapitulation","tune","loudness","tweedle","hornist","vocalizer","violoncellist","vocaliser","accompanyist","concertinist","cornetist","lutanist","harmoniser","vibist","gambist","carillonneur","bandsman"]
-    },
-    influencer = {
-        str: "influencer",
-        keywords: ["celebrity","social media","influencer marketing","blogging","marketing","youtuber","notability","celeb","internet","facebook","twitter","sixdegrees.com","youtube","instagram","tiktok","blogs","wechat","whatsapp","snapchat","vsco","lifestyle guru","momus","personal branding","influence","determinant","stakeholder","factor","communicator","social","marketer","facilitator","advertiser","shaper","segmentation","contributor","podcasting","encourager","analytics","savvy","brands","adopter","gatekeeper","panelist","attendee","salesperson","innovator","sustainer","predictor","endorser","aggregator","trends","verticals","ideation","metrics","kingmaker","tool","maven","inviter","component","demographics","preferences","affluents","follower","philanthropy","panellist","confidante","evangelizing","multichannel","behaviors","evangelists","boomer","variety","hollywood","personality type","vlogging","viral phenomenon","viral video","pewdiepie","internet meme","psychographics","enabler","trendsetters","motivators","differentiator","trendsetter","intrapreneur","implementer","isobar","networker","determiner","twitterer","prescriber","marketeer","definer","aruspex","inceptor","couponing","recommenders","nurturer","creatives","reputability","recommender","swayful","flexitarian","babytalk","jobholder","mktg","schmoozer","discriminator","prsa","embracer"]
-    }
-]
+var type1 =[];
+var type2 =[];
 
-var type1 ='';
-var type2 ='';
-
-function compaer(input1,output,redisKey,s3Key,type){
-        client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
+ function compaer(input1,output,redisKey,s3Key,type){
+        const promise = client.get('search/tweets', {q: input1, count: 100, lang: 'en',recent_type: 'popular'}, function(error, tweets, response) {
             var source = input1;
             var counterActor = 0;
             var counterAthelete = 0;
@@ -84,46 +60,10 @@ function compaer(input1,output,redisKey,s3Key,type){
                         profile_img: tweets.statuses[i].user.profile_image_url_https,
                         text: tweets.statuses[i].text
                     }
+                    
                     output.push(holder);
                 }
             }
-            
-            for(i = 0; i < classified.length;i++){
-                for(j = 0; j < classified[i].keywords.length;j++){
-                    var source = classified[i].keywords[j];
-                    for(k = 0; k < output.length;k++){
-                        var t =  natural.LevenshteinDistance(source, output[k].text, {search: true});
-                        if(t.distance < 1){                     
-                            if(classified[i].str === "actor"){
-                                counterActor = counterActor + 1;
-                            }
-                            if(classified[i].str === "athlete"){
-                                counterAthelete++;
-                            }
-                            if(classified[i].str === "musician"){
-                                counterMusician++;
-                            }
-                            if(classified[i].str === "influencer"){
-                                counterInfluencer++;
-                            }
-                        }
-                    }
-                }
-                if(counterActor > counterAthelete && counterActor > counterMusician && counterActor > counterInfluencer ){
-                    type = 'actor';
-                } 
-                if(counterAthelete > counterActor && counterAthelete > counterMusician && counterAthelete >counterInfluencer ){
-                    type = 'athlete';
-                }
-                if(counterMusician > counterActor && counterMusician > counterAthelete && counterMusician > counterInfluencer){
-                    type = 'musician';
-                }
-                if(counterInfluencer > counterActor && counterInfluencer > counterAthelete && counterInfluencer >counterMusician){
-                    type = 'influencer';
-                }
-            }
-
-            console.log(output.length);
 
                 //Store total in s3 
                 const body = JSON.stringify({
@@ -136,7 +76,6 @@ function compaer(input1,output,redisKey,s3Key,type){
                 };
                 const uploadPromise = new AWS.S3({ apiVersion: '2006-03-01' }).putObject(objectParams).promise();
                 uploadPromise.then(function (data) {
-                    console.log("Data uploaded to " + bucketName + "/" + s3Key + " and Redis Cache.");
                 });
 
             //Store in cache
@@ -152,8 +91,8 @@ app.get ('/index', async (req, res) => {
     const redisKey2 = `compareme:${searchItem2}`;
     const s3Key2 = `compareme-${searchItem2}`;
 
-    type1 ='';
-    type2 ='';    
+    type1 =[];
+    type2 =[];    
 
     //initialise arrays to keep it empty
     word1= [];
@@ -167,7 +106,6 @@ app.get ('/index', async (req, res) => {
             //Checks if it is in the cache
             if(result){
                 word1 = JSON.parse(result); 
-                console.log("Real");
             } else {
                 return new AWS.S3({ apiVersion: '2006-03-01' }).getObject(params1, (err, result) =>{
                     if(result){
@@ -176,7 +114,6 @@ app.get ('/index', async (req, res) => {
     
                     }
                     compaer(searchItem1,word1,redisKey1,s3Key1,type1);
-                    console.log("Cached");
                 });
             }
         });
@@ -185,7 +122,6 @@ app.get ('/index', async (req, res) => {
             //Checks if it is in the cache
             if(result){
                 word2 = JSON.parse(result); 
-                console.log("Real");
             } else {
                 //Checks if not in cache checks in the s3 Storage, if it is 
                 return new AWS.S3({ apiVersion: '2006-03-01' }).getObject(params2, (err, result) =>{
@@ -193,9 +129,7 @@ app.get ('/index', async (req, res) => {
                     }else{
     
                     }
-                    console.log("trying");
                     compaer(searchItem2,word2,redisKey2,s3Key2,type2);
-                    console.log("Cached");
                 });
             }
         });
@@ -207,8 +141,6 @@ app.get ('/index', async (req, res) => {
                 var dataSet = [dataInput1, dataInput2, 0];
                 var dataSet2 = [searchItem1,searchItem2, ""]
 
-                console.log(type1);
-
                 t = 
                 '<script>' +
                     'var ctx = document.getElementById("myChart").getContext("2d");'+
@@ -217,7 +149,7 @@ app.get ('/index', async (req, res) => {
                         'data: {'+
                             'labels: ["'+searchItem1+'","'+searchItem2+'"],'+
                             'datasets: [{'+
-                                'label: "# of Votes",'+
+                                'label: "# of Mentions",'+
                                 'data: ['+dataInput1+','+dataInput2+'],'+
                                 'backgroundColor: ['+
                                     '"rgba(255, 99, 132, 0.2)",'+
@@ -250,7 +182,6 @@ app.get ('/index', async (req, res) => {
             word2,
         })
     },4000);
-
 });
 
 app.listen(3000, () => {
